@@ -1,8 +1,12 @@
 import streamlit as st
 import requests
+import os
 
-# URL de tu API
-API_URL = "http://localhost:8000"
+# URL de API para localhost
+#API_URL = "http://localhost:8000"
+
+#URL de API para deploy
+API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 # ─────────────────────────────────────
 # CONFIGURACIÓN DE LA PÁGINA
