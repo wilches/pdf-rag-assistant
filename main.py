@@ -29,7 +29,7 @@ model = ChatGoogleGenerativeAI(
     temperature=0.3 #less creativity, more precision
 )
 # 4. Create retriever
-retriever = vector_store.as_retriever(search_kwargs={"k":1})
+retriever = vector_store.as_retriever(search_kwargs={"k":3})
 
 # 5. Personalized propmt
 prompt = ChatPromptTemplate.from_messages([
