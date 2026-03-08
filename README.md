@@ -38,9 +38,15 @@ streamlit run frontend.py
 
 ## 📁 Project Structure
 pdf-rag-assistant/
+
 ├── indexer.py      # PDF processing and ChromaDB indexing
+
 ├── query.py        # RAG query pipeline
+
 ├── api.py          # FastAPI REST endpoints
+
 ├── frontend.py     # Streamlit UI
+
 ├── data/           # PDF uploads
+
 └── .env            # API keys (not in repo)
