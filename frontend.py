@@ -12,18 +12,18 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 # CONFIGURACIÓN DE LA PÁGINA
 # ─────────────────────────────────────
 st.set_page_config(
-    page_title="PDF RAG Assistant",
-    page_icon="📄",
+    page_title="Contract Risk Analyzer",
+    page_icon="⚖️",
     layout="centered"
 )
 
 st.title("📄 PDF RAG Assistant")
-st.caption("Sube un PDF y hazle preguntas")
+st.caption("Sube un contrato y analiza sus riesgos automáticamente")
 
 # ─────────────────────────────────────
-# SECCIÓN 1: SUBIR PDF
+# SECCIÓN 1: SUBIR CONTRATO
 # ─────────────────────────────────────
-st.header("1. Sube tu documento")
+st.header("1. Sube tu contrato")
 
 uploaded_file = st.file_uploader(
     "Selecciona un PDF",
@@ -47,10 +47,81 @@ if uploaded_file is not None:
                 st.error(f"❌ Error: {response.json()['detail']}")
 
 # ─────────────────────────────────────
-# SECCIÓN 2: HACER PREGUNTAS
+# SECCIÓN 1.2: ANALIZAR CONTRATO
 # ─────────────────────────────────────
-st.header("2. Hazle preguntas al documento")
 
+
+# Inicializar estado si no existe
+if 'analizado' not in st.session_state:
+    st.session_state.analizado = False
+
+# 2. Funcion que se ejecuta solo al hacer clic
+def iniciar_analisis():
+    st.session_state.analizado = True
+
+# 3. Cambio de estado al presionar el botón
+st.button("Analizar", on_click=iniciar_analisis)
+
+# 4. Si el estado es True, ejecutamos la logica
+if st.session_state.analizado:
+    with st.spinner("Analizando documento..."):
+        # Manda el archivo a la API
+        response = requests.post(f"{API_URL}/analyze")
+
+        if response.status_code == 200:
+            st.success(f"✅ Análisis completado!")
+            st.session_state["analysis"] = response.json() # guardar el análisis completo
+        else:
+            st.error(f"❌ Error: {response.json()['detail']}")
+
+# ─────────────────────────────────────
+# SECCIÓN 2: ANÁLISIS DE RIESGO
+# ─────────────────────────────────────
+
+st.header("2. Análisis de Riesgo")
+
+
+if "analysis" in st.session_state:
+    analysis = st.session_state["analysis"] #response.json()  <- donde estan todos los datos
+
+    st.write(f"**Tipo**: {analysis['contract_type']}")
+    st.write(f"**Resumen**: {analysis['summary']}")
+    st.write(f"**Riesgo General**: {analysis['overall_risk']}")
+    st.space("small")
+    st.write(f"**Cláusulas**:")
+    st.space("small")
+
+    risk_colors = {
+        "HIGH": st.error,
+        "MEDIUM": st.warning, #guardando la funcion como objeto
+        "LOW": st.success
+    }
+    risk_emojis = {
+    "HIGH": "🔴",
+    "MEDIUM": "🟡",
+    "LOW": "🟢"
+    }
+
+    for clause in analysis["clauses"]:
+        risk_level = clause["risk_level"]
+
+        # Titutlo con color y emoji dinamico
+        risk_colors[risk_level](f"{risk_emojis[risk_level]} {clause['clause_title']} - {risk_level}")
+
+        # Detalles de la cláusula
+        st.write(f"📌 **Texto:** {clause['clause_text']}")
+        st.write(f"⚠️ **Razón:** {clause['reason']}")
+        st.write(f"💡 **Recomendación:** {clause['recommendation']}")
+
+        st.divider()  # separador entre cláusulas
+
+
+
+# ─────────────────────────────────────
+# SECCIÓN 3: PREGUNTALE AL CONTRATO
+# ─────────────────────────────────────
+
+st.header("3. Pregúntale al contrato")
 # Historial de conversación
 if "messages" not in st.session_state:
     st.session_state["messages"] = []

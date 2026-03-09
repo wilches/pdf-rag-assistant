@@ -3,11 +3,18 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+import shutil
 import os
 
 load_dotenv()
 
 def index_pdf(pdf_path: str):
+    # Limpia ChromaDB antes de indexar
+    if os.path.exists("data/chroma_db"):
+        shutil.rmtree("data/chroma_db")  # borra la carpeta completa
+        print("ChromaDB limpiado ✅")
+
+
     print(f"Indexando: {pdf_path}")
 
     # 1. Load
@@ -17,8 +24,8 @@ def index_pdf(pdf_path: str):
 
     # 2.Chunks
     splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500,
-        chunk_overlap=50,
+        chunk_size=800,
+        chunk_overlap=150,
         separators=["\n\n", "\n", " ", ""]
     )
     chunks = splitter.split_documents(pages)
@@ -41,4 +48,4 @@ def index_pdf(pdf_path: str):
     return True
 
 if __name__=="__main__":
-    index_pdf("data/sample.pdf")
+    index_pdf("data/contract.pdf")

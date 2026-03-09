@@ -5,6 +5,7 @@ import shutil
 import os
 from indexer import index_pdf
 from query import ask
+from analyzer import analyze_contract as run_analysis
 
 app = FastAPI(
     title="PDF RAG Assistant",
@@ -34,16 +35,13 @@ def root():
 
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
-    #Valida que sea PDF
     if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, datail="Solo se aceptan archivos PDF.")
+        raise HTTPException(status_code=400, detail="Solo se aceptan archivos PDF")
 
-    # Guarda el archivo
     file_path = f"data/{file.filename}"
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Indexa el PDF
     try:
         index_pdf(file_path)
         return {
@@ -51,7 +49,13 @@ async def upload_pdf(file: UploadFile = File(...)):
             "message": f"{file.filename} indexado exitosamente"
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail = str(e))
+        # Borra el archivo si falló
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        raise HTTPException(
+            status_code=400,
+            detail=f"No se pudo leer el PDF. Asegúrate que el documento tenga texto seleccionable y no sea una imagen escaneada."
+        )
 
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
@@ -64,5 +68,13 @@ def ask_question(request: QuestionRequest):
             "question": request.question,
             "answer": answer
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/analyze")
+def analyze():
+    try:
+        result = run_analysis()
+        return result #devuelve el JSON con el análisis (diccionario con respuestas)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
