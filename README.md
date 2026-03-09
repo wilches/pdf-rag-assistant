@@ -1,52 +1,110 @@
-# 📄 PDF RAG Assistant
+# ⚖️ Contract Risk Analyzer
 
-Chat with your PDF documents using RAG (Retrieval Augmented Generation).
+Aplicación web con IA que analiza contratos legales, identifica cláusulas riesgosas y genera recomendaciones usando RAG (Retrieval Augmented Generation).
 
-## 🛠️ Tech Stack
-- **LLM:** Google Gemini 1.5 Flash
-- **Embeddings:** Google Gemini Embeddings
-- **Vector DB:** ChromaDB
-- **Backend:** FastAPI
-- **Frontend:** Streamlit
-- **Orchestration:** LangChain
+🔗 **Demo:** [contract-risk-analyzer.streamlit.app](https://pdf-rag-assistant-5ewrmktvkhu8y3zygkwc9j.streamlit.app/)
 
-## 🏗️ Architecture
-PDF → Chunks → Embeddings → ChromaDB
-Question → Embedding → ChromaDB Search → Gemini → Answer
+---
 
-## 🚀 Run locally
+## 🎯 El Problema
 
-### 1. Clone the repo
-git clone https://github.com/tuusuario/pdf-rag-assistant
+Todos hemos firmado contratos sin leerlos completamente. Un contrato de 40 páginas puede esconder:
 
-### 2. Create virtual environment
-python -m venv venv
-venv\Scripts\activate
+- Cláusulas de penalización sin límite
+- Condiciones de terminación abusivas
+- Renovaciones automáticas no deseadas
 
-### 3. Install dependencies
-pip install -r requirements.txt
+**Esta app lee el contrato por ti y te dice qué negociar.**
 
-### 4. Set up environment variables
-Create a .env file:
-GOOGLE_API_KEY=your_api_key_here
+---
 
-### 5. Run the API
-uvicorn api:app --reload
+## ✨ Funcionalidades
 
-### 6. Run the frontend
-streamlit run frontend.py
+- 📄 **Carga de PDF** — Sube cualquier contrato en PDF
+- 🔍 **Análisis automático** — Detecta y clasifica cláusulas riesgosas
+- 🚦 **Clasificación de riesgo** — ALTO 🔴 / MEDIO 🟡 / BAJO 🟢
+- 💡 **Recomendaciones** — Te dice exactamente qué negociar
+- 💬 **Chat con el contrato** — Haz preguntas específicas
 
-## 📁 Project Structure
-pdf-rag-assistant/
+---
 
-├── indexer.py      # PDF processing and ChromaDB indexing
+## 🛠️ Stack Tecnológico
 
-├── query.py        # RAG query pipeline
+| Capa | Tecnología |
+| :--- | :--- |
+| LLM | Google Gemini 2.0 Flash |
+| Embeddings | Google Gemini Embeddings |
+| Vector DB | ChromaDB |
+| Orquestación | LangChain |
+| Backend | FastAPI |
+| Frontend | Streamlit |
+| Deploy API | Render |
+| Deploy UI | Streamlit Cloud |
+---
 
-├── api.py          # FastAPI REST endpoints
+## 📁 Estructura del Proyecto
 
-├── frontend.py     # Streamlit UI
+    contract-risk-analyzer/
+    ├── analyzer.py      # Pipeline de análisis RAG
+    ├── indexer.py       # Procesamiento de PDFs
+    ├── query.py         # Pipeline de consultas
+    ├── api.py           # Endpoints FastAPI
+    ├── frontend.py      # Interfaz Streamlit
+    ├── data/            # PDFs (gitignored)
+    └── .env             # API keys (gitignored)
 
-├── data/           # PDF uploads
+---
 
-└── .env            # API keys (not in repo)
+## 🚀 Correr Localmente
+
+**1. Clona el repositorio**
+
+    git clone https://github.com/tuusuario/pdf-rag-assistant.git
+    cd pdf-rag-assistant
+
+**2. Crea el entorno virtual**
+
+    python -m venv venv
+    venv\Scripts\activate
+
+**3. Instala dependencias**
+
+    pip install -r requirements.txt
+
+**4. Configura variables de entorno**
+
+Crea un archivo `.env`:
+
+    GOOGLE_API_KEY=tu_api_key_aqui
+
+**5. Corre la API**
+
+    uvicorn api:app --reload
+
+**6. Corre el frontend**
+
+    streamlit run frontend.py
+
+---
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| GET | `/` | Health check |
+| POST | `/upload` | Subir e indexar PDF |
+| POST | `/analyze` | Analizar riesgos |
+| POST | `/ask` | Preguntar sobre el contrato |
+---
+
+## ⚠️ Limitaciones
+
+- Funciona mejor con PDFs de texto, no escaneados
+- El análisis es generado por IA y no reemplaza asesoría legal
+- El free tier puede tener demoras de inicio (~30 segundos)
+
+---
+
+## 📬 Contacto
+
+**Juan Camilo Herrera Wilches**
+- GitHub: [@wilches](https://github.com/wilches)
+- LinkedIn: [Juan Wilches](https://www.linkedin.com/in/juan-wilches/)
